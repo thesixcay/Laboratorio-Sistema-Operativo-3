@@ -1,0 +1,54 @@
+Comandos 
+
+Configuración de parametros de red.
+
+# Ver conexiones de red
+nmcli con show
+
+# DHCP
+sudo nmcli con modify "Wired connection 1" ipv4.method auto
+sudo nmcli con up "Wired connection 1"
+
+# IP estática + DNS
+sudo nmcli con modify "Wired connection 1" ipv4.addresses 192.168.1.100/24
+sudo nmcli con modify "Wired connection 1" ipv4.gateway 192.168.1.1
+sudo nmcli con modify "Wired connection 1" ipv4.dns "8.8.8.8 8.8.4.4"
+sudo nmcli con modify "Wired connection 1" ipv4.method manual
+sudo nmcli con up "Wired connection 1"
+
+# Verificar archivo DNS
+ls -l /etc/resolv.conf
+
+# Si es archivo normal, editar manualmente
+sudo nano /etc/resolv.conf
+# (Agregar: nameserver 8.8.8.8 \n nameserver 8.8.4.4)
+
+----------------------------------------------------------------------------------------------------
+Gestion de Usuario y grupos
+
+sudo adduser osvaldo
+sudo usermod -aG sudo osvaldo
+
+sudo addgroup guest
+sudo adduser invitado
+sudo usermod -aG guest invitado
+
+sudo deluser invitado               # o: sudo deluser --remove-home invitado
+sudo delgroup guest
+
+----------------------------------------------------------------------------------------------------
+Gestion de Permisos de archivos
+
+mkdir materia
+cd materia
+vi estudiante.txt                      # Editar y guardar con :wq
+chmod 700 estudiante.txt              # Solo propietario con permisos totales
+chmod 070 estudiante.txt              # Solo grupo con permisos totales
+cd ..
+mkdir materia2
+cp materia/estudiante.txt materia2/
+rm -r materia
+
+
+
+
