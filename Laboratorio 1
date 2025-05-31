@@ -1,6 +1,6 @@
 Comandos 
 
-Configuración de parametros de red.
+Practica 2: Configuración de parametros de red.
 
 # Ver conexiones de red
 nmcli con show
@@ -16,18 +16,11 @@ sudo nmcli con modify "Wired connection 1" ipv4.dns "8.8.8.8 8.8.4.4"
 sudo nmcli con modify "Wired connection 1" ipv4.method manual
 sudo nmcli con up "Wired connection 1"
 
-# Verificar archivo DNS
-ls -l /etc/resolv.conf
-
-# Si es archivo normal, editar manualmente
-sudo nano /etc/resolv.conf
-# (Agregar: nameserver 8.8.8.8 \n nameserver 8.8.4.4)
-
 ----------------------------------------------------------------------------------------------------
-Gestion de Usuario y grupos
+Practica 3: Gestion de Usuario y grupos
 
-sudo adduser osvaldo
-sudo usermod -aG sudo osvaldo
+sudo adduser thesixcay
+sudo usermod -aG sudo thesixcay
 
 sudo addgroup guest
 sudo adduser invitado
@@ -37,7 +30,7 @@ sudo deluser invitado               # o: sudo deluser --remove-home invitado
 sudo delgroup guest
 
 ----------------------------------------------------------------------------------------------------
-Gestion de Permisos de archivos
+Practica 4: Gestion de Permisos de archivos
 
 mkdir materia
 cd materia
