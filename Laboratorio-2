@@ -1,0 +1,33 @@
+Practica 1 
+
+sudo apt update	Actualiza la lista de paquetes disponibles
+sudo apt upgrade -y	Instala todas las actualizaciones pendientes
+cat /etc/apt/sources.list	Muestra el archivo principal de repositorios
+apt search bashtop	Busca si bashtop está disponible
+sudo apt install bashtop	Instala el paquete bashtop
+wget URL	Descarga archivos desde internet
+sudo apt install ./archivo.deb	Instala un paquete .deb local
+bashtop	Ejecuta el monitor de recursos
+sudo apt purge bashtop	Elimina bashtop y su configuración
+sudo apt autoremove	Elimina dependencias huérfanas
+
+practica 2 
+
+sudo crontab -e	Edita el cron del usuario root
+apt update && apt upgrade -y	Actualiza el sistema
+/sbin/shutdown -r now	Reinicia el sistema inmediatamente
+sudo apt install at	Instala el programa at
+sudo systemctl enable --now atd	Activa el servicio que permite usar at
+`echo "comando"	at tiempo`
+ls /tmp	Muestra el contenido del directorio /tmp
+atq	Muestra las tareas pendientes programadas con at
+
+practica 3 
+
+sudo fdisk -l	Muestra los discos conectados
+sudo mkfs.ext4 /dev/sdb	Formatea el disco como ext4
+mkdir ~/Escritorio/disco	Crea una carpeta para montar el disco
+sudo mount /dev/sdb <ruta>	Monta el disco en la carpeta
+touch <archivo>	Crea un archivo vacío
+sudo umount <ruta>	Desmonta el disco
+ls <ruta>	Lista archivos dentro del directorio
