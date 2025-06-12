@@ -1,0 +1,168 @@
+Practica 1 
+
+sudo nano /etc/default/grub
+GRUB_TIMEOUT=20
+sudo update-grub
+sudo reboot
+
+presionar e cuando este subiendo el sistema y luego al final de la linea que dice linux poner 
+init=/bin/bash
+
+Quedará algo como:
+linux /boot/vmlinuz-xxxx root=UUID=xxxx ro quiet splash init=/bin/bash
+
+ Presiona Ctrl + X
+
+Remontar el sistema de archivos en modo lectura-escritura:
+mount -o remount,rw /
+
+Cambiar la contraseña de root:
+
+passwd root 
+
+Después de cambiar la contraseña, reinicia el sistema:
+
+exec /sbin/init
+
+ó
+
+reboot -f
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+Practica 2 
+
+Primer Script: Backup de /home/usuario
+
+Abre la terminal y crea el script:
+
+nano backup_home.sh
+
+este fue el script que use: 
+
+#!/bin/bash
+
+# Usuario (modificar si es necesario)
+USUARIO="osvaldoserver"
+
+# Ruta origen
+ORIGEN="/home/$USUARIO"
+
+# Ruta destino (puede ser en /home/$USUARIO/backups por ejemplo)
+DESTINO="/home/$USUARIO/backups"
+
+# Crear el directorio destino si no existe
+mkdir -p "$DESTINO"
+
+# Fecha y hora actual en el formato dd-mm-yyyy:hh:mm
+FECHA=$(date +"%d-%m-%Y:%H:%M")
+
+# Nombre del archivo de backup
+ARCHIVO="backup-$FECHA.tar.gz"
+
+# Crear el backup
+tar -czvf "$DESTINO/$ARCHIVO" "$ORIGEN"
+
+# Mostrar resultado
+echo "Backup creado en: $DESTINO/$ARCHIVO"
+*********************************************************************************
+ Dale permisos de ejecución:
+chmod +x backup_home.sh
+
+Ejecuta el script:
+./backup_home.sh
+
+Se creará un comprimido con la fecha y hora actual en /home/juan/backups/
+**********************************************************************************
+Segundo Script: Guardar salida de ifconfig en el escritorio con nombre personalizado
+
+Crea el script:
+nano ifconfig_to_file.sh
+
+este fue el script que use:
+
+#!/bin/bash
+
+# Preguntar el nombre del archivo
+read -p "Ingrese el nombre del archivo: " NOMBRE
+
+# Ruta al escritorio (adaptar si usas otro entorno de escritorio)
+ESCRITORIO="/home/$USER/Desktop"
+
+# Crear el archivo con la salida de ifconfig
+ifconfig > "$ESCRITORIO/$NOMBRE.txt"
+
+# Confirmación
+echo "Archivo creado: $ESCRITORIO/$NOMBRE.txt"
+************************************************************************************
+
+Dar permisos de ejecución:
+chmod +x ifconfig_to_file.sh
+
+Ejecutar el script:
+./ifconfig_to_file.sh
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+practica 3 
+
+poner maquina virtual en modo bridge 
+
+hacerle ping desde la maquina host a ip de la maquina virtual
+
+Habilitar SSH en Parrot OS
+
+sudo apt update
+sudo apt install openssh-server
+
+Habilitar e iniciar el servicio SSH
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+Verificar el estado:
+sudo systemctl status ssh
+
+Validar conexión SSH con usuario y contraseña
+ssh osvaldoserver@10.0.0.242
+
+Generar llaves SSH en Windows (sin passphrase)
+
+Abre PowerShell Genera las llaves:
+ssh-keygen -t rsa -b 4096
+
+Cuando te pregunte la passphrase, simplemente presiona Enter dos veces para dejarla en blanco.
+
+Copiar la clave pública al servidor
+
+Abre el archivo parrot_key.pub con Bloc de notas y copia su contenido.
+
+Desde Windows, conéctate al Parrot OS por SSH usando usuario/contraseña como antes.
+
+En Parrot OS, ejecuta:
+
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+nano ~/.ssh/authorized_keys
+
+Pega el contenido de la clave pública.
+
+Guarda y cierra.
+
+Ajusta permisos:
+
+chmod 600 ~/.ssh/authorized_keys
+
+Probar conexión SSH sin contraseña
+ssh osvaldoserver@10.0.0.242
+
+
+
+
+
+
+
+
+
+
+
+
+
+
