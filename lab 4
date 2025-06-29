@@ -1,0 +1,124 @@
+practica 1 
+
+🧱 1. Instalar Apache2
+sudo apt update
+sudo apt install apache2 -y
+
+
+Asegúrate de que Apache está corriendo:
+sudo systemctl enable apache2
+sudo systemctl start apache2
+
+
+
+🌐 2. Website estático: "Hola Mundo" (Puerto 80)
+- Crear el archivo HTML:
+sudo mkdir -p /var/www/hola_mundo
+echo "<html><body><h1>Hola Mundo</h1></body></html>" | sudo tee /var/www/hola_mundo/index.html
+
+
+- Crear archivo de host virtual:
+sudo nano /etc/apache2/sites-available/hola_mundo.conf
+
+
+Contenido:
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/hola_mundo
+    ServerName hola.local
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+- Activar el host y reiniciar Apache:
+sudo a2ensite hola_mundo.conf
+sudo systemctl reload apache2
+
+
+- Agregar al archivo hosts para pruebas locales:
+echo "127.0.0.1 hola.local" | sudo tee -a /etc/hosts
+
+
+
+📄 3. Website con tu nombre y materia (Puerto 8080)
+- Crear directorio y archivo HTML (ajusta con tus datos reales):
+sudo mkdir -p /var/www/osvaldo_web
+echo "<html><body><h1>Osvaldo Gómez - 1234567 - Redes I</h1></body></html>" | sudo tee /var/www/osvaldo_web/index.html
+
+
+- Crear archivo de configuración para el puerto 8080:
+sudo nano /etc/apache2/sites-available/osvaldo_web.conf
+
+
+Contenido:
+<VirtualHost *:8080>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/osvaldo_web
+    ServerName osvaldo.local
+    ErrorLog ${APACHE_LOG_DIR}/error8080.log
+    CustomLog ${APACHE_LOG_DIR}/access8080.log combined
+</VirtualHost>
+
+
+- Permitir Apache escuche en 8080:
+echo "Listen 8080" | sudo tee -a /etc/apache2/ports.conf
+
+
+- Activar sitio y reiniciar Apache:
+sudo a2ensite osvaldo_web.conf
+sudo systemctl reload apache2
+
+
+- Agregar host local:
+echo "127.0.0.1 osvaldo.local" | sudo tee -a /etc/hosts
+
+
+
+✅ Verificación
+- Abre tu navegador:
+- http://hola.local → Deberías ver “Hola Mundo”
+- http://osvaldo.local:8080 → Deberías ver tu página con tu nombre y la materia
+---------------------------------------------------------------------------------------------------------------
+
+practica 3 
+
+Linux 
+
+apt install cups 
+
+apt install cups-pdf 
+
+systemctl enable cups 
+
+systemctl start cups 
+
+sudo usermod -aG Lpadmin $USER 
+
+groups osvaldoserver 
+
+nano /etc/cups/cupsd.conf 
+
+cambiar Listen localhost en vez de Localhost poner 0.0.0.0:631
+
+en Locatio poner Order allow.deny y abajo poner Allow @LOCAL
+
+luego reiniciar cups con systemctl restart cups 
+
+ufw status verbose 
+
+ufw allow 631/tcp
+
+ufw status verbose 
+
+cupsctl
+
+cupsctl --remote-admin --remote-any --share-printers
+ 
+Windows
+
+abrir pagina de cups con la ip de mi maquina virtual y :631
+
+ir a administracion > anadir impresora > segunda opcion > compartir esta impresora > generico > anadir impresora > segunda opcion >impresoras > virtual pdf printer > copiar la url > en windows buscar impresora > agregar y esperar a que aparezca la otra opcion > seleccionar por nombre y pegar la url sin las s de https > generic text only > y darle a imprimir pagina de prueba 
+
+ 
