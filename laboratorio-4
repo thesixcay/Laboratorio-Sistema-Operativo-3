@@ -80,7 +80,46 @@ echo "127.0.0.1 osvaldo.local" | sudo tee -a /etc/hosts
 - http://hola.local → Deberías ver “Hola Mundo”
 - http://osvaldo.local:8080 → Deberías ver tu página con tu nombre y la materia
 ---------------------------------------------------------------------------------------------------------------
+Practica 2
 
+🛠 Paso 1: Instalar Postfix
+En tu terminal (como root o con sudo):
+sudo apt update
+sudo apt install postfix mailutils -y
+
+
+Durante la instalación, selecciona "Internet Site" y usa tu nombre de host como dominio (puedes usar algo como correo.local si estás en entorno de prueba).
+
+⚙ Paso 2: Configuración básica (si necesitas editarla)
+Archivo principal de configuración:
+sudo nano /etc/postfix/main.cf
+
+
+Verifica que tenga líneas como estas:
+myhostname = correo.local
+myorigin = /etc/mailname
+inet_interfaces = all
+inet_protocols = ipv4
+mydestination = $myhostname, localhost.localdomain, localhost
+
+
+Luego reinicia Postfix:
+sudo systemctl restart postfix
+
+
+
+✉ Paso 3: Enviar el correo
+Usa este comando para cumplir con la práctica:
+echo -e "Osvaldo [Tu matrícula]" | mail -s "MambruSeFueALaGuerra" os3conadrian@gmail.com
+
+
+Eso envía un correo con el cuerpo que incluye tu nombre y matrícula.
+
+✅ Verifica
+Puedes revisar si el correo se fue con éxito usando:
+tail -f /var/log/mail.log
+
+---------------------------------------------------------------------------------------------------------------
 practica 3 
 
 Linux 
