@@ -1,0 +1,32 @@
+Syncronizacion de carpetas con Rsync 
+
+
+# EN SERVIDOR PRIMARIO (10.0.0.31)
+
+# 1. Crear carpeta y archivos
+mkdir -p ~/sync_folder && cd ~/sync_folder
+touch archivo{001..100}.txt
+
+# 2. Probar conexión SSH al secundario
+ssh usuario@10.0.0.35 exit
+
+# 3. Ejecutar rsync manualmente por primera vez
+rsync -avz ~/sync_folder/ usuario@10.0.0.35:/home/usuario/sync_folder/
+
+# 4. Crear script de sincronización
+echo '#!/bin/bash
+rsync -avz /home/usuario/sync_folder/ usuario@10.0.0.35:/home/usuario/sync_folder/' > ~/sync_rsync.sh
+
+chmod +x ~/sync_rsync.sh
+
+# 5. Agregar tarea cron para ejecutarse cada 1 minuto
+(crontab -l 2>/dev/null; echo "* * * * * /home/usuario/sync_rsync.sh") | crontab -
+
+# 6. Crear archivo nuevo para probar sincronización
+touch ~/sync_folder/nuevo.txt
+
+# ESPERAR 1 MINUTO...
+
+# 7. EN SERVIDOR SECUNDARIO (10.0.0.35)
+ls ~/sync_folder/
+_____________________________________________________________________________________________________________________________________
