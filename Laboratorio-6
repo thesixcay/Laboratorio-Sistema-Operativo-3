@@ -1,0 +1,491 @@
+practica 1 
+
+1. Configuración de NFS (Compartir archivos entre Linux)
+En el Servidor:
+
+    Instalar NFS:
+    bash
+
+sudo apt update && sudo apt install nfs-kernel-server -y
+
+Crear directorio y archivos:
+bash
+
+sudo mkdir /OS3 && for i in {1..100}; do sudo touch /OS3/Adrian${i}.txt; done
+
+Dar permisos:
+bash
+
+sudo chown nobody:nogroup /OS3 && sudo chmod 777 /OS3
+
+Configurar exports:
+bash
+
+echo "/OS3 *(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
+
+Reiniciar NFS:
+bash
+
+    sudo systemctl restart nfs-kernel-server
+
+En el Cliente:
+
+    Instalar cliente NFS:
+    bash
+
+sudo apt update && sudo apt install nfs-common -y
+
+Crear punto de montaje:
+bash
+
+sudo mkdir /mnt/os3_shared
+
+Montar manualmente:
+bash
+
+sudo mount <IP_SERVIDOR>:/OS3 /mnt/os3_shared
+
+Configurar montaje automático:
+bash
+
+echo "<IP_SERVIDOR>:/OS3 /mnt/os3_shared nfs defaults 0 0" | sudo tee -a /etc/fstab
+
+Probar reinicio:
+bash
+
+    sudo reboot && ls /mnt/os3_shared
+
+2. Cifrado con GPG2
+
+    Instalar GPG2:
+    bash
+
+sudo apt update && sudo apt install gnupg2 -y
+
+Generar clave GPG:
+bash
+
+gpg2 --full-generate-key
+
+(Seguir instrucciones interactivas)
+
+Crear archivo a cifrar:
+bash
+
+mkdir ~/seguridad && echo "Mensaje secreto" > ~/seguridad/mensaje.txt
+
+Cifrar archivo:
+bash
+
+gpg2 -e -r "tu_email@dominio.com" ~/seguridad/mensaje.txt
+
+Intentar leer archivo cifrado:
+bash
+
+cat ~/seguridad/mensaje.txt.gpg
+
+Descifrar archivo:
+bash
+
+gpg2 -d ~/seguridad/mensaje.txt.gpg > ~/seguridad/mensaje_descifrado.txt
+
+Ver contenido descifrado:
+bash
+
+cat ~/seguridad/mensaje_descifrado.txt
+-------------------------------------------------------------------------------------------------------------------------------------
+
+practica 2 
+
+1. Habilitar servicios HTTP, FTP y SSH
+Instalar y habilitar servicios
+bash
+
+sudo apt update
+sudo apt install apache2 vsftpd openssh-server -y
+sudo systemctl enable --now apache2 vsftpd ssh
+
+Verificar que funcionan
+bash
+
+sudo systemctl status apache2 vsftpd ssh
+ss -tulnp | grep -E '80|21|22'
+
+2. Bloquear puertos 80, 21 y 22 con IPTables
+Reglas para bloquear tráfico
+bash
+
+sudo iptables -A INPUT -p tcp --dport 80 -j DROP   # HTTP
+sudo iptables -A INPUT -p tcp --dport 21 -j DROP   # FTP
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP   # SSH
+
+Verificar reglas
+bash
+
+sudo iptables -L INPUT -n --line-numbers
+
+Probar conexión (debe fallar)
+bash
+
+curl http://localhost          # HTTP (puerto 80)
+ftp localhost                  # FTP (puerto 21)
+ssh localhost                  # SSH (puerto 22)
+
+3. Permitir nuevamente puertos 80, 21 y 22 con IPTables
+Eliminar reglas de bloqueo
+bash
+
+sudo iptables -D INPUT -p tcp --dport 80 -j DROP
+sudo iptables -D INPUT -p tcp --dport 21 -j DROP
+sudo iptables -D INPUT -p tcp --dport 22 -j DROP
+
+Permitir tráfico
+bash
+
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+Verificar reglas
+bash
+
+sudo iptables -L INPUT -n --line-numbers
+
+Probar conexión (debe funcionar)
+bash
+
+curl http://localhost
+ftp localhost
+ssh localhost
+
+4. Bloquear puertos con UFW (Debian/Ubuntu/Parrot OS)
+Habilitar UFW
+bash
+
+sudo ufw enable
+
+Bloquear puertos
+bash
+
+sudo ufw deny 80/tcp   # HTTP
+sudo ufw deny 21/tcp   # FTP
+sudo ufw deny 22/tcp   # SSH
+
+Verificar reglas
+bash
+
+sudo ufw status numbered
+
+Probar conexión (debe fallar)
+bash
+
+curl http://localhost
+ftp localhost
+ssh localhost
+
+5. Permitir puertos nuevamente con UFW
+Permitir tráfico
+bash
+
+sudo ufw allow 80/tcp   # HTTP
+sudo ufw allow 21/tcp   # FTP
+sudo ufw allow 22/tcp   # SSH
+
+Verificar reglas
+bash
+
+sudo ufw status numbered
+
+Probar conexión (debe funcionar)
+bash
+
+curl http://localhost
+ftp localhost
+ssh localhost
+
+------------------------------------------------------------------------------------------------------------
+
+practica 3 
+
+1. Instalación de Snort en Parrot OS
+bash
+
+# Actualizar e instalar dependencias
+sudo apt update
+sudo apt install -y snort libpcap-dev
+
+# Verificar versión
+snort -V
+
+2. Configuración Básica de Snort
+bash
+
+# Editar configuración principal
+sudo nano /etc/snort/snort.conf
+
+# Modificar estas líneas:
+var HOME_NET [IP_de_tu_ParrotOS]/32   # Ej: 192.168.1.100/32
+var EXTERNAL_NET any
+ipvar DNS_SERVERS $HOME_NET
+
+3. Creación de Reglas de Detección
+bash
+
+# Crear archivo de reglas locales
+sudo nano /etc/snort/rules/local.rules
+
+Agregar las siguientes reglas:
+plaintext
+
+# Detección de ICMP (Ping)
+alert icmp any any -> $HOME_NET any (msg:"ICMP Ping Detectado"; sid:1000001; rev:1;)
+
+# Detección de tráfico FTP (puerto 21)
+alert tcp any any -> $HOME_NET 21 (msg:"Tráfico FTP Detectado"; sid:1000002; rev:1;)
+
+# Detección de tráfico SSH (puerto 22)
+alert tcp any any -> $HOME_NET 22 (msg:"Tráfico SSH Detectado"; sid:1000003; rev:1;)
+
+# Detección de tráfico HTTP (puerto 80)
+alert tcp any any -> $HOME_NET 80 (msg:"Tráfico HTTP Detectado"; sid:1000004; rev:1;)
+
+4. Ejecución de Snort en Modo IDS
+bash
+
+# Verificar configuración
+sudo snort -T -c /etc/snort/snort.conf
+
+# Ejecutar en modo IDS (reemplaza 'eth0' con tu interfaz de red)
+sudo snort -A console -q -c /etc/snort/snort.conf -i eth0 -l /var/log/snort/
+
+5. Pruebas desde Windows 11
+Prueba 1: Detección de Ping (ICMP)
+powershell
+
+# En Windows (PowerShell o CMD):
+ping [IP_de_ParrotOS]
+
+Salida esperada en Snort:
+text
+
+[**] [1:1000001:1] ICMP Ping Detectado [**]
+[Priority: 0] 
+{ICMP} 192.168.1.50 -> 192.168.1.100
+
+Prueba 2: Detección de FTP (Puerto 21)
+powershell
+
+# Usar telnet para probar conexión FTP
+telnet [IP_de_ParrotOS] 21
+
+Salida esperada en Snort:
+text
+
+[**] [1:1000002:1] Tráfico FTP Detectado [**]
+[Priority: 0] 
+{TCP} 192.168.1.50:51234 -> 192.168.1.100:21
+
+Prueba 3: Detección de SSH (Puerto 22)
+powershell
+
+# Usar telnet para probar conexión SSH
+telnet [IP_de_ParrotOS] 22
+
+Salida esperada en Snort:
+text
+
+[**] [1:1000003:1] Tráfico SSH Detectado [**]
+[Priority: 0] 
+{TCP} 192.168.1.50:51235 -> 192.168.1.100:22
+
+Prueba 4: Detección de HTTP (Puerto 80)
+powershell
+
+# Usar curl o navegador web
+curl http://[IP_de_ParrotOS]
+
+Salida esperada en Snort:
+text
+
+[**] [1:1000004:1] Tráfico HTTP Detectado [**]
+[Priority: 0] 
+{TCP} 192.168.1.50:51236 -> 192.168.1.100:80
+
+6. Visualización de Alertas
+bash
+
+# Ver alertas en tiempo real (en otra terminal)
+sudo tail -f /var/log/snort/alert
+
+7. Detener Snort
+bash
+
+# Para detener Snort
+sudo pkill snort
+
+Resumen de Configuración
+Protocolo	Puerto	Regla Snort	Prueba Windows
+ICMP	-	alert icmp any any -> $HOME_NET any	ping [IP]
+FTP	21	alert tcp any any -> $HOME_NET 21	telnet [IP] 21
+SSH	22	alert tcp any any -> $HOME_NET 22	telnet [IP] 22
+HTTP	80	alert tcp any any -> $HOME_NET 80	curl http://[IP]
+
+Consejos:
+
+    Asegúrate que los servicios (FTP/SSH/HTTP) están corriendo en Parrot OS
+
+    Verifica que no hay reglas de firewall bloqueando el tráfico
+
+    Para pruebas más reales, puedes usar Nmap desde Windows:
+    powershell
+
+nmap -p 21,22,80 [IP_de_ParrotOS]
+------------------------------------------------------------------------------------------------------------------
+
+practica 4 
+
+1. Instalación de Google Authenticator en Parrot OS/Ubuntu
+bash
+
+sudo apt update
+sudo apt install libpam-google-authenticator -y
+
+2. Configuración para el Usuario
+
+    Ejecutar el asistente de configuración (como usuario normal, NO root):
+    bash
+
+    google-authenticator
+
+    Seguir las instrucciones interactivas:
+
+        ¿Generar tokens basados en tiempo? (Sí)
+
+        Guardar el código de emergencia (en un lugar seguro)
+
+        ¿Actualizar el archivo ~/.google_authenticator? (Sí)
+
+        ¿Permitir múltiples usos del mismo código? (No, por seguridad)
+
+        ¿Limitar ventana de verificación? (Sí)
+
+        ¿Habilitar protección contra fuerza bruta? (Sí)
+
+    Configurar el código QR en Google Authenticator (app móvil):
+
+        Escanear el QR mostrado en terminal.
+
+        O ingresar manualmente la clave secreta.
+
+3. Configurar PAM para usar Google Authenticator
+
+    Editar el archivo PAM para SSH:
+    bash
+
+sudo nano /etc/pam.d/sshd
+
+Agregar al inicio del archivo:
+plaintext
+
+auth required pam_google_authenticator.so
+
+Comentar (si existe) la línea:
+plaintext
+
+    @include common-auth
+
+    (para evitar doble solicitud de contraseña).
+
+4. Configurar SSH para usar 2FA
+
+    Editar la configuración de SSH:
+    bash
+
+sudo nano /etc/ssh/sshd_config
+
+Asegurar estas líneas estén así:
+plaintext
+
+ChallengeResponseAuthentication yes
+UsePAM yes
+PasswordAuthentication yes  # (Si usas contraseña + 2FA)
+
+Reiniciar SSH:
+bash
+
+    sudo systemctl restart sshd
+
+5. Prueba de Acceso desde Windows 11 (Host)
+Opción 1: Usar PuTTY (Recomendado)
+
+    Abrir PuTTY y configurar:
+
+        Host Name: [IP_de_tu_VM]
+
+        Connection > SSH > Auth:
+
+            Habilitar "Keyboard-interactive".
+
+    Conectar:
+
+        Primero pedirá usuario.
+
+        Luego contraseña.
+
+        Finalmente, el código de Google Authenticator (6 dígitos).
+
+Opción 2: Usar PowerShell/CMD
+powershell
+
+ssh usuario@[IP_de_tu_VM]
+
+    Secuencia de autenticación:
+
+        Ingresar contraseña.
+
+        Ingresar código de 6 dígitos (app móvil).
+
+6. Solución de Problemas Comunes
+🔹 Error: "Permission denied (keyboard-interactive)"
+
+    Verifica que en /etc/ssh/sshd_config esté:
+    plaintext
+
+    ChallengeResponseAuthentication yes
+    UsePAM yes
+
+🔹 No se solicita el código 2FA
+
+    Revisa que /etc/pam.d/sshd tenga:
+    plaintext
+
+    auth required pam_google_authenticator.so
+
+🔹 Código no funciona
+
+    Verifica sincronización de tiempo en la VM:
+    bash
+
+    sudo apt install ntpdate
+    sudo ntpdate pool.ntp.org
+
+7. Desactivar 2FA (Opcional)
+
+    Eliminar el archivo de configuración:
+    bash
+
+rm ~/.google_authenticator
+
+Revertir cambios en PAM:
+bash
+
+sudo nano /etc/pam.d/sshd
+
+    Eliminar pam_google_authenticator.so.
+
+    Descomentar @include common-auth.
+
+Reiniciar SSH:
+bash
+
+sudo systemctl restart sshd
