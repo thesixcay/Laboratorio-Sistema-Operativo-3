@@ -1,0 +1,45 @@
+practica 1 
+
+servidor 
+
+# 1. Instalar servidor NFS
+sudo apt update && sudo apt install nfs-kernel-server -y
+
+# 2. Crear directorio OS3 y generar 100 archivos Adrian[1-100].txt
+sudo mkdir /OS3 && for i in {1..100}; do sudo touch /OS3/Adrian${i}.txt; done
+
+# 3. Asignar permisos universales (lectura/escritura para todos)
+sudo chown nobody:nogroup /OS3 && sudo chmod -R 777 /OS3
+
+# 4. Configurar exportación NFS (compartir a toda la red)
+echo "/OS3 *(rw,sync,no_subtree_check)" | sudo tee /etc/exports
+
+# 5. Aplicar cambios y reiniciar servicio
+sudo exportfs -a && sudo systemctl restart nfs-kernel-server
+
+# 6. Verificar IP del servidor (para usarla en el cliente)
+hostname -I
+
+cliente 
+
+# 1. Instalar cliente NFS
+sudo apt update && sudo apt install nfs-common -y
+
+# 2. Crear punto de montaje
+sudo mkdir -p /mnt/os3_shared
+
+# 3. Montar directorio (reemplaza [IP_SERVIDOR] con la IP del paso 6 del servidor)
+sudo mount [IP_SERVIDOR]:/OS3 /mnt/os3_shared
+
+# 4. Verificar archivos (deben aparecer Adrian1.txt a Adrian100.txt)
+ls /mnt/os3_shared | wc -l  # Debe mostrar 100
+
+# 5. Montaje automático al iniciar (editar /etc/fstab)
+echo "[IP_SERVIDOR]:/OS3 /mnt/os3_shared nfs defaults 0 0" | sudo tee -a /etc/fstab
+
+# 6. Probar montaje automático
+sudo mount -a && ls /mnt/os3_shared
+---------------------------------------------------------
+
+practica 2 
+
