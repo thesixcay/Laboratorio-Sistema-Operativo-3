@@ -1,0 +1,69 @@
+practica 1 
+
+✅ 1. Instalar Docker en Parrot OS
+bash
+Copiar
+Editar
+sudo apt update
+sudo apt install docker.io -y
+sudo systemctl start docker
+sudo systemctl enable docker
+Verifica instalación:
+
+bash
+Copiar
+Editar
+docker --version
+✅ 2. Descargar la imagen de NGINX desde Docker Hub
+bash
+Copiar
+Editar
+docker pull nginx
+✅ 3. Crear contenedor con redirección de puertos y volumen persistente
+Primero, crea el directorio local:
+
+bash
+Copiar
+Editar
+mkdir -p /home/website
+Ahora ejecuta el contenedor:
+
+bash
+Copiar
+Editar
+docker run -d --name nginx-server \
+  -p 8888:80 \
+  -v /home/website:/usr/share/nginx/html \
+  nginx
+✅ 4. Crear una página HTML sencilla
+Crea el archivo index.html:
+
+bash
+Copiar
+Editar
+nano /home/website/index.html
+Pega el siguiente contenido:
+
+html
+Copiar
+Editar
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mi Página</title>
+</head>
+<body>
+  <h1>Osvaldo Alejandro Solano Gonzalez</h1>
+  <p>Matrícula: 20242361</p>
+</body>
+</html>
+Guarda y cierra (Ctrl + O, luego Enter, y Ctrl + X).
+
+✅ 5. Verificar en el navegador
+Abre tu navegador y visita:
+http://127.0.0.1:8888
+-------------------------------
+practica 2 
+
+
+
