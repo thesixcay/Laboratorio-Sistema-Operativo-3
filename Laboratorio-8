@@ -65,5 +65,62 @@ http://127.0.0.1:8888
 -------------------------------
 practica 2 
 
+🚀 1. Descargar e instalar imagen de Portainer
+Abre una terminal en Parrot OS y ejecuta:
 
+bash
+Copiar
+Editar
+docker pull portainer/portainer-ce
+📦 2. Crear contenedor de Portainer con todos los puertos mapeados
+Ejecuta:
+
+bash
+Copiar
+Editar
+docker run -d \
+  --name portainer \
+  --restart always \
+  -p 9443:9443 \
+  -p 8000:8000 \
+  -p 9000:9000 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  portainer/portainer-ce
+Esto mapea los puertos internos al host (9443 para interfaz segura, 9000 opcional para vieja UI).
+
+🌐 3. Ingresar a la interfaz de administración
+Abre tu navegador en Parrot y entra en:
+
+cpp
+Copiar
+Editar
+https://127.0.0.1:9443
+Acepta el certificado no seguro.
+
+Crea un usuario y contraseña de administrador.
+
+Elige "Docker local" para vincular con el Docker Engine de tu máquina Parrot.
+
+🧱 4. Detener contenedor gninx desde Portainer
+Dentro de la interfaz de Portainer:
+
+Ve a Containers.
+
+Busca el contenedor llamado gninx.
+
+Haz clic en Stop.
+
+✅ Verifica que el contenedor se detuvo:
+
+En Portainer, debe aparecer como “Stopped”.
+
+En terminal puedes confirmar con:
+
+bash
+Copiar
+Editar
+docker ps -a
+📄 5. Mostrar resultado en el navegador
+Si antes gninx mostraba algo en un puerto (por ejemplo, http://localhost:8080), ahora al entrar verás error de conexión o sitio no disponible, porque está detenido.
 
