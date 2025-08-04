@@ -1,0 +1,17 @@
+practica 1 instalar webmin 
+
+
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install wget curl -y
+
+sudo nano /etc/apt/sources.list
+
+deb http://download.webmin.com/download/repository sarge contrib
+
+wget -q http://www.webmin.com/jcameron-key.asc -O- | sudo apt-key add -
+
+sudo apt update
+sudo apt install webmin -y
+
+https://TU-IP:10000
